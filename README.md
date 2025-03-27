@@ -1,28 +1,28 @@
-# 项目集合
+# Project Collection
 
-这个仓库包含两个独立的项目：21点游戏和Web收藏夹Plus。
+This repository contains two independent projects: Blackjack Game and Web Bookmarks Plus.
 
-## 项目1：21点游戏
+## Project 1: Blackjack Game
 
-### 简介
-这是一个21点（Blackjack）纸牌游戏的实现版本。玩家通过获得接近21点但不超过21点的牌面点数来击败庄家。
+### Introduction
+This is an implementation of the Blackjack card game. Players aim to beat the dealer by getting a card total close to 21 without exceeding it.
 
-### 主要功能
-- 完整的21点游戏规则实现
-- 玩家对战电脑庄家
-- 直观的游戏界面
-- 基本的下注系统
+### Key Features
+- Complete implementation of Blackjack rules
+- Player vs. computer dealer gameplay
+- Intuitive game interface
+- Basic betting system
 
 
-## 项目2：Web收藏夹Plus
+## Project 2: Web Bookmarks Plus
 
-### 简介
-Web收藏夹Plus是一个增强型网页书签管理工具，帮助用户更高效地组织和访问常用网站。
+### Introduction
+Web Bookmarks Plus is an enhanced web bookmark management tool that helps users organize and access frequently visited websites more efficiently.
 
-### 主要功能
-- 分类管理网页书签
-- 标签系统便于快速查找
-- 导入/导出书签数据
+### Key Features
+- Categorized management of web bookmarks
+- Tag system for quick searching
+- Import/export bookmark data
 
 
 
