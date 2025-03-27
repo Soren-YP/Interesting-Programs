@@ -1,7 +1,7 @@
 *.vscode
 *.exe
 *.zip
-.gitignore
+*.gitignore
 !*.docx
 !*.c
 !*.cpp
