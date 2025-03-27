@@ -1,0 +1,583 @@
+:root {
+    --primary-color: #4a6fa5;
+    --secondary-color: #6c757d;
+    --accent-color: #28a745;
+    --background-color: #f8f9fa;
+    --card-background: #ffffff;
+    --text-color: #212529;
+    --border-color: #dee2e6;
+    --sidebar-bg: #f0f2f5;
+    --modal-bg: #ffffff;
+    --card-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    --hover-color: #e9ecef;
+    --active-category: #e2e8f0;
+    --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --transition-speed: 0.3s;
+}
+
+.dark-theme {
+    --primary-color: #6c8eb7;
+    --secondary-color: #adb5bd;
+    --accent-color: #5cb85c;
+    --background-color: #121212;
+    --card-background: #1e1e1e;
+    --text-color: #e9ecef;
+    --border-color: #495057;
+    --sidebar-bg: #1a1a1a;
+    --modal-bg: #2c2c2c;
+    --card-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    --hover-color: #2a2a2a;
+    --active-category: #2d3748;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-main);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
+.app {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* 侧边栏样式 */
+.sidebar {
+    width: 250px;
+    background-color: var(--sidebar-bg);
+    padding: 20px;
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    transition: background-color var(--transition-speed);
+}
+
+.app-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.app-title i {
+    color: var(--primary-color);
+    font-size: 24px;
+}
+
+.app-title h1 {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.theme-switch {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+}
+
+input:checked+.slider {
+    background-color: var(--primary-color);
+}
+
+input:checked+.slider:before {
+    transform: translateX(24px);
+}
+
+.slider.round {
+    border-radius: 24px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+.categories h2 {
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+.categories ul {
+    list-style: none;
+    margin-bottom: 15px;
+}
+
+.categories li {
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-bottom: 5px;
+}
+
+.categories li:hover {
+    background-color: var(--hover-color);
+}
+
+.categories li.active {
+    background-color: var(--active-category);
+    font-weight: 500;
+}
+
+.add-category {
+    display: flex;
+    margin-top: 10px;
+}
+
+.add-category input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px 0 0 4px;
+    background-color: var(--card-background);
+    color: var(--text-color);
+}
+
+.add-category button {
+    padding: 8px 12px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+}
+
+.bottom-actions {
+    margin-top: auto;
+    display: flex;
+    gap: 10px;
+}
+
+.action-btn {
+    padding: 8px 15px;
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.action-btn:hover {
+    opacity: 0.9;
+}
+
+/* 主内容区样式 */
+.main-content {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    background-color: var(--card-background);
+    border-radius: 30px;
+    padding: 8px 15px;
+    box-shadow: var(--card-shadow);
+    width: 350px;
+}
+
+.search-box i {
+    color: var(--secondary-color);
+    margin-right: 10px;
+}
+
+.search-box input {
+    border: none;
+    background: none;
+    outline: none;
+    color: var(--text-color);
+    width: 100%;
+}
+
+#add-bookmark-btn {
+    padding: 10px 20px;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.2s;
+}
+
+#add-bookmark-btn:hover {
+    background-color: #218838;
+}
+
+/* 收藏展示区 */
+.bookmarks-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.bookmark-card {
+    background-color: var(--card-background);
+    border-radius: 8px;
+    box-shadow: var(--card-shadow);
+    padding: 15px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    /* 修改为指针，表示可点击 */
+    position: relative;
+}
+
+.bookmark-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.bookmark-card.dragging {
+    opacity: 0.5;
+    transform: scale(0.98);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.bookmark-card.drag-over {
+    border: 2px dashed var(--primary-color);
+}
+
+.bookmark-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    /* 增加图标与文本间距 */
+    margin-bottom: 15px;
+}
+
+.bookmark-icon {
+    width: 48px;
+    /* 放大图标 */
+    height: 48px;
+    /* 放大图标 */
+    border-radius: 8px;
+    object-fit: contain;
+    background-color: #f8f8f8;
+    padding: 3px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dark-theme .bookmark-icon {
+    background-color: #2a2a2a;
+}
+
+.bookmark-title {
+    font-weight: 500;
+    font-size: 18px;
+    /* 稍微放大标题 */
+    flex: 1;
+}
+
+.bookmark-actions {
+    display: flex;
+    gap: 10px;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    opacity: 0;
+    /* 默认隐藏操作按钮 */
+    transition: opacity 0.2s;
+}
+
+.bookmark-card:hover .bookmark-actions {
+    opacity: 1;
+    /* 悬停时显示操作按钮 */
+}
+
+.bookmark-actions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--secondary-color);
+    font-size: 14px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+.dark-theme .bookmark-actions button {
+    background-color: rgba(50, 50, 50, 0.8);
+}
+
+.bookmark-actions button:hover {
+    color: var(--primary-color);
+    background-color: rgba(255, 255, 255, 0.95);
+}
+
+.dark-theme .bookmark-actions button:hover {
+    background-color: rgba(70, 70, 70, 0.95);
+}
+
+.bookmark-url {
+    color: var(--primary-color);
+    font-size: 14px;
+    margin-bottom: 10px;
+    word-break: break-all;
+    display: none;
+    /* 隐藏URL */
+}
+
+.bookmark-notes {
+    font-size: 14px;
+    color: var(--secondary-color);
+    border-top: 1px solid var(--border-color);
+    margin-top: 10px;
+    padding-top: 10px;
+}
+
+.bookmark-category {
+    display: inline-block;
+    padding: 3px 8px;
+    background-color: rgba(74, 111, 165, 0.2);
+    color: var(--primary-color);
+    border-radius: 4px;
+    font-size: 12px;
+    margin-top: 10px;
+}
+
+/* 模态框样式 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: var(--modal-bg);
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 500px;
+    margin: 10% auto;
+    padding: 25px;
+    position: relative;
+    transition: background-color var(--transition-speed);
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 24px;
+    color: var(--secondary-color);
+    cursor: pointer;
+}
+
+.modal h2 {
+    margin-bottom: 20px;
+    color: var(--text-color);
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--text-color);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--card-background);
+    color: var(--text-color);
+}
+
+.form-group textarea {
+    height: 100px;
+    resize: vertical;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.form-actions button {
+    padding: 8px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#save-btn {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+}
+
+#cancel-btn {
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+}
+
+/* 分类管理样式 */
+.category-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.category-name {
+    flex: 1;
+}
+
+.category-actions {
+    display: flex;
+    gap: 5px;
+    visibility: hidden;
+}
+
+.category-item:hover .category-actions {
+    visibility: visible;
+}
+
+.category-actions button {
+    background: none;
+    border: none;
+    color: var(--secondary-color);
+    cursor: pointer;
+    padding: 0;
+    font-size: 12px;
+}
+
+.category-actions button:hover {
+    color: var(--primary-color);
+}
+
+.category-edit-form {
+    display: flex;
+    width: 100%;
+}
+
+.category-edit-form input {
+    flex: 1;
+    padding: 4px 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px 0 0 4px;
+    background-color: var(--card-background);
+    color: var(--text-color);
+}
+
+.category-edit-form button {
+    padding: 4px 8px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .app {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        padding: 15px;
+    }
+
+    .top-bar {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+    }
+
+    .search-box {
+        width: 100%;
+    }
+
+    .bookmarks-container {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-content {
+        width: 95%;
+        margin: 5% auto;
+        padding: 20px;
+    }
+}

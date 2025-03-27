@@ -1,0 +1,11 @@
+*.vscode
+*.exe
+!*.docx
+!*.c
+!*.cpp
+!*.py
+!*.html
+!*.txt
+!*.pdf
+
+
