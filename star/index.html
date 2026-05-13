@@ -1,31 +1,40 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>收藏夹 Plus</title>
+    <title>收藏</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Serif+SC:wght@500;600&display=swap" rel="stylesheet">
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 </head>
 
 <body>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
     <div class="app">
-        <!-- 侧边栏 -->
-        <div class="sidebar">
+        <aside class="sidebar">
             <div class="app-title">
-                <i class="fas fa-bookmark"></i>
-                <h1>收藏夹 Plus</h1>
+                <span class="brand-mark"><i class="fas fa-bookmark"></i></span>
+                <div>
+                    <h1>收藏</h1>
+                </div>
             </div>
+
             <div class="theme-switch">
-                <span>暗色模式</span>
-                <label class="switch">
+                <span>深色模式</span>
+                <label class="switch" aria-label="切换深色模式">
                     <input type="checkbox" id="theme-toggle">
                     <span class="slider round"></span>
                 </label>
             </div>
-            <div class="categories">
+
+            <nav class="categories" aria-label="收藏分类">
                 <h2>分类</h2>
                 <ul id="category-list">
                     <li data-category="all" class="active">全部收藏</li>
@@ -35,36 +44,66 @@
                 </ul>
                 <div class="add-category">
                     <input type="text" id="new-category" placeholder="新分类名称">
-                    <button id="add-category-btn"><i class="fas fa-plus"></i></button>
+                    <button id="add-category-btn" title="添加分类"><i class="fas fa-plus"></i></button>
                 </div>
-            </div>
+            </nav>
+
             <div class="bottom-actions">
                 <button id="import-btn" class="action-btn"><i class="fas fa-file-import"></i> 导入</button>
                 <button id="export-btn" class="action-btn"><i class="fas fa-file-export"></i> 导出</button>
                 <input type="file" id="import-file" accept=".json" hidden>
             </div>
-        </div>
 
-        <!-- 主内容区 -->
-        <div class="main-content">
-            <!-- 顶部操作栏 -->
+            <div class="signature-container">
+                <span class="signature-text">Yapeng</span>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <section class="nav-search-panel" aria-label="网页搜索">
+                <form id="web-search-form" class="web-search-form">
+                    <label class="web-search-label" for="web-search-input">搜索</label>
+                    <div class="web-search-shell">
+                        <i class="fas fa-magnifying-glass"></i>
+                        <input type="text" id="web-search-input" placeholder="输入关键词，或直接粘贴网址" autocomplete="off">
+                        <select id="web-search-engine" aria-label="搜索引擎">
+                            <option value="bing">Bing</option>
+                            <option value="google">Google</option>
+                            <option value="baidu">百度</option>
+                            <option value="duckduckgo">DuckDuckGo</option>
+                        </select>
+                        <button type="submit">前往</button>
+                    </div>
+                </form>
+            </section>
+
             <div class="top-bar">
                 <div class="search-box">
                     <i class="fas fa-search"></i>
-                    <input type="text" id="search-input" placeholder="搜索收藏...">
+                    <input type="text" id="search-input" placeholder="搜索收藏、网址或备注...">
                 </div>
-                <button id="add-bookmark-btn">添加收藏</button>
+                <button id="add-bookmark-btn"><i class="fas fa-plus"></i> 添加收藏</button>
             </div>
 
-            <!-- 收藏展示区 -->
-            <div class="bookmarks-container" id="bookmarks-container">
-                <!-- 书签卡片将通过 JavaScript 动态生成 -->
-            </div>
+            <section class="star-section is-collapsed" id="star-section">
+                <div class="section-heading">
+                    <div>
+                        <h2>常用收藏</h2>
+                        <p id="bookmark-summary" class="visually-hidden" aria-live="polite"></p>
+                    </div>
+                    <button id="toggle-star-btn" class="toggle-star-btn" type="button" aria-expanded="false" aria-controls="bookmarks-container">
+                        <span>展开全部</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+                <div class="star-preview">
+                    <div class="bookmarks-container" id="bookmarks-container" aria-live="polite"></div>
+                </div>
+            </section>
 
-            <!-- 添加收藏弹窗 -->
             <div class="modal" id="add-modal">
                 <div class="modal-content">
-                    <span class="close-btn">&times;</span>
+                    <button class="close-btn" type="button" aria-label="关闭">&times;</button>
                     <h2 id="modal-title">添加收藏</h2>
                     <form id="bookmark-form">
                         <input type="hidden" id="bookmark-id">
@@ -86,17 +125,18 @@
                         </div>
                         <div class="form-group">
                             <label for="bookmark-notes">备注</label>
-                            <textarea id="bookmark-notes" placeholder="添加备注..."></textarea>
+                            <textarea id="bookmark-notes" placeholder="添加一点备注..."></textarea>
                         </div>
                         <div class="form-actions">
-                            <button type="submit" id="save-btn">保存</button>
                             <button type="button" id="cancel-btn">取消</button>
+                            <button type="submit" id="save-btn">保存</button>
                         </div>
                     </form>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
+
     <script src="script.js"></script>
 </body>
 
