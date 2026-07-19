@@ -290,8 +290,8 @@ function renderBookmarks() {
         const actions = document.createElement('div');
         actions.className = 'bookmark-actions';
         actions.innerHTML = `
-            <button class="edit-btn" data-id="${bookmark.id}" title="编辑"><i class="fas fa-edit"></i></button>
-            <button class="delete-btn" data-id="${bookmark.id}" title="删除"><i class="fas fa-trash"></i></button>
+            <button type="button" class="edit-btn" data-id="${bookmark.id}" title="编辑" aria-label="编辑收藏"><i class="fas fa-edit"></i></button>
+            <button type="button" class="delete-btn" data-id="${bookmark.id}" title="删除" aria-label="删除收藏"><i class="fas fa-trash"></i></button>
         `;
 
         header.append(icon, title, actions);
@@ -395,6 +395,9 @@ function createCategoryItem(category, editable, categories = []) {
     const item = document.createElement('li');
     item.dataset.category = category.id;
     item.className = `${currentCategory === category.id ? 'active' : ''}${editable ? ' category-item' : ''}`.trim();
+    item.tabIndex = 0;
+    item.setAttribute('role', 'button');
+    item.setAttribute('aria-pressed', String(currentCategory === category.id));
 
     if (editingCategoryId === category.id) {
         const form = document.createElement('div');
@@ -406,8 +409,10 @@ function createCategoryItem(category, editable, categories = []) {
         input.value = category.name;
 
         const saveBtn = document.createElement('button');
+        saveBtn.type = 'button';
         saveBtn.className = 'save-category-btn';
         saveBtn.dataset.id = category.id;
+        saveBtn.setAttribute('aria-label', '保存分类名称');
         saveBtn.innerHTML = '<i class="fas fa-check"></i>';
 
         form.append(input, saveBtn);
@@ -424,8 +429,8 @@ function createCategoryItem(category, editable, categories = []) {
         const actions = document.createElement('div');
         actions.className = 'category-actions';
         actions.innerHTML = `
-            <button class="edit-category-btn" data-id="${category.id}" title="编辑分类"><i class="fas fa-edit"></i></button>
-            <button class="delete-category-btn" data-id="${category.id}" title="删除分类"><i class="fas fa-trash"></i></button>
+            <button type="button" class="edit-category-btn" data-id="${category.id}" title="编辑分类" aria-label="编辑分类"><i class="fas fa-edit"></i></button>
+            <button type="button" class="delete-category-btn" data-id="${category.id}" title="删除分类" aria-label="删除分类"><i class="fas fa-trash"></i></button>
         `;
         item.appendChild(actions);
     }
@@ -435,12 +440,19 @@ function createCategoryItem(category, editable, categories = []) {
 
 function bindCategoryEvents(categories) {
     document.querySelectorAll('#category-list li').forEach(item => {
-        item.addEventListener('click', event => {
+        const selectCategory = event => {
             if (event.target.closest('button') || event.target.closest('.category-edit-form')) return;
             currentCategory = item.dataset.category;
             editingCategoryId = null;
             renderCategories(getCategories());
             renderBookmarks();
+        };
+
+        item.addEventListener('click', selectCategory);
+        item.addEventListener('keydown', event => {
+            if (event.key !== 'Enter' && event.key !== ' ') return;
+            event.preventDefault();
+            selectCategory(event);
         });
     });
 
@@ -520,11 +532,13 @@ function openEditModal(id) {
 
 function openModal() {
     addModal.classList.add('is-open');
+    addModal.setAttribute('aria-hidden', 'false');
     setTimeout(() => document.getElementById('bookmark-url').focus(), 80);
 }
 
 function closeModal() {
     addModal.classList.remove('is-open');
+    addModal.setAttribute('aria-hidden', 'true');
     bookmarkForm.reset();
 }
 

@@ -4,12 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>收藏</title>
+    <meta name="description" content="一个简洁高效的个人收藏与网页入口。">
+    <meta name="theme-color" content="#17171f">
+    <title>收藏 · 个人网络入口</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Serif+SC:wght@500;600&display=swap" rel="stylesheet">
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 </head>
 
@@ -23,11 +22,12 @@
                 <span class="brand-mark"><i class="fas fa-bookmark"></i></span>
                 <div>
                     <h1>收藏</h1>
+                    <p>个人网络入口</p>
                 </div>
             </div>
 
             <div class="theme-switch">
-                <span>深色模式</span>
+                <span>夜间模式</span>
                 <label class="switch" aria-label="切换深色模式">
                     <input type="checkbox" id="theme-toggle">
                     <span class="slider round"></span>
@@ -44,7 +44,9 @@
                 </ul>
                 <div class="add-category">
                     <input type="text" id="new-category" placeholder="新分类名称">
-                    <button id="add-category-btn" title="添加分类"><i class="fas fa-plus"></i></button>
+                    <button id="add-category-btn" type="button" title="添加分类" aria-label="添加分类">
+                        <i class="fas fa-plus"></i>
+                    </button>
                 </div>
             </nav>
 
@@ -62,7 +64,10 @@
         <main class="main-content">
             <section class="nav-search-panel" aria-label="网页搜索">
                 <form id="web-search-form" class="web-search-form">
-                    <label class="web-search-label" for="web-search-input">搜索</label>
+                    <div class="web-search-copy">
+                        <label class="web-search-label" for="web-search-input">去往任何地方</label>
+                        <p>输入关键词，或粘贴网址直接打开</p>
+                    </div>
                     <div class="web-search-shell">
                         <i class="fas fa-magnifying-glass"></i>
                         <input type="text" id="web-search-input" placeholder="输入关键词，或直接粘贴网址" autocomplete="off">
@@ -80,16 +85,16 @@
             <div class="top-bar">
                 <div class="search-box">
                     <i class="fas fa-search"></i>
-                    <input type="text" id="search-input" placeholder="搜索收藏、网址或备注...">
+                    <input type="text" id="search-input" placeholder="在收藏中搜索">
                 </div>
-                <button id="add-bookmark-btn"><i class="fas fa-plus"></i> 添加收藏</button>
+                <button id="add-bookmark-btn" type="button"><i class="fas fa-plus"></i> 新建收藏</button>
             </div>
 
             <section class="star-section is-collapsed" id="star-section">
                 <div class="section-heading">
                     <div>
                         <h2>常用收藏</h2>
-                        <p id="bookmark-summary" class="visually-hidden" aria-live="polite"></p>
+                        <p id="bookmark-summary" class="section-description" aria-live="polite"></p>
                     </div>
                     <button id="toggle-star-btn" class="toggle-star-btn" type="button" aria-expanded="false" aria-controls="bookmarks-container">
                         <span>展开全部</span>
@@ -101,8 +106,8 @@
                 </div>
             </section>
 
-            <div class="modal" id="add-modal">
-                <div class="modal-content">
+            <div class="modal" id="add-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-hidden="true">
+                <div class="modal-content" role="document">
                     <button class="close-btn" type="button" aria-label="关闭">&times;</button>
                     <h2 id="modal-title">添加收藏</h2>
                     <form id="bookmark-form">
