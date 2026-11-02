@@ -1,0 +1,14 @@
+<!doctype html>
+<!-- 仅开发用：写入设计测试数据后跳回应用，供截图评审。?theme=dark 切换深色。 -->
+<meta charset="UTF-8">
+<title>QA fixture</title>
+<script>
+  (async () => {
+    const state = await fetch('/tests/fixtures/design-state.json').then((response) => response.json());
+    const params = new URLSearchParams(location.search);
+    if (params.get('theme')) state.settings.theme = params.get('theme');
+    if (params.get('view')) state.settings.view = params.get('view');
+    localStorage.setItem('star.appState.v1', JSON.stringify(state));
+    location.replace('/');
+  })();
+</script>

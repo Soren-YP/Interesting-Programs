@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A · 测绘底图</title>
+<style>
+  :root {
+    --ground: #f2f2ee;
+    --sheet: #f8f8f5;
+    --ink: #111112;
+    --ink-2: #4a4b4e;
+    --mute: #8d8e91;
+    --hair: #d3d3cd;
+    --hair-strong: #a9aaa4;
+    --signal: #ffe100;
+    --cjk: "MiSans", "Noto Sans SC", "Microsoft YaHei UI", sans-serif;
+    --din: "Bahnschrift", "DIN Alternate", "Segoe UI Variable Display", sans-serif;
+    --mono: "Cascadia Mono", "Consolas", monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--cjk);
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+
+  /* 贯穿视口的框架线 */
+  .frame { position: fixed; inset: 0; pointer-events: none; }
+  .frame i { position: absolute; background: var(--hair); }
+  .frame .v1 { left: 248px; top: 0; bottom: 0; width: 1px; }
+  .frame .h1 { left: 0; right: 0; top: 64px; height: 1px; }
+  .frame .h2 { left: 0; right: 0; bottom: 40px; height: 1px; }
+  .cross { position: fixed; width: 11px; height: 11px; pointer-events: none; }
+  .cross::before, .cross::after { content: ""; position: absolute; background: var(--ink); }
+  .cross::before { left: 5px; top: 0; width: 1px; height: 11px; }
+  .cross::after { top: 5px; left: 0; height: 1px; width: 11px; }
+
+  .contour { position: fixed; left: -36px; bottom: 44px; width: 284px; opacity: .6; pointer-events: none; }
+
+  /* 顶栏 */
+  .topbar {
+    position: fixed; left: 0; right: 0; top: 0; height: 64px;
+    display: grid; grid-template-columns: 248px 1fr auto; align-items: center;
+  }
+  .mark { padding-left: 28px; display: flex; align-items: baseline; gap: 10px; }
+  .mark b { font-family: var(--din); font-weight: 700; font-size: 26px; letter-spacing: .02em; }
+  .mark span { font-family: var(--mono); font-size: 9.5px; color: var(--mute); letter-spacing: .08em; }
+  .crumb { padding-left: 32px; font-family: var(--mono); font-size: 11px; color: var(--mute); letter-spacing: .06em; }
+  .crumb em { font-style: normal; color: var(--ink); }
+  .top-actions { display: flex; height: 64px; }
+  .top-actions button {
+    border: 0; border-left: 1px solid var(--hair); background: transparent; width: 64px;
+    font: inherit; color: var(--ink-2); cursor: pointer;
+  }
+  .top-actions .new {
+    border: 0; background: var(--ink); color: #fff; height: 64px; padding: 0 28px 0 24px;
+    display: flex; align-items: center; gap: 14px; font: 500 14px var(--cjk); cursor: pointer; position: relative; white-space: nowrap; width: auto;
+  }
+  .top-actions .new::after { content: ""; position: absolute; right: 0; top: 0; width: 10px; height: 10px; background: var(--signal); }
+  .top-actions .new small { font: 10px var(--mono); color: #8d8e91; letter-spacing: .08em; }
+
+  /* 侧栏 */
+  .side { position: fixed; left: 0; top: 65px; bottom: 41px; width: 248px; padding: 28px 0 0; overflow: hidden; }
+  .side h6 {
+    margin: 0 28px 10px; font: 400 10px var(--mono); color: var(--mute); letter-spacing: .12em;
+    display: flex; justify-content: space-between;
+  }
+  .nav { list-style: none; margin: 0 0 30px; padding: 0; }
+  .nav li {
+    display: grid; grid-template-columns: 28px 1fr auto; align-items: center;
+    height: 44px; padding: 0 28px; font-size: 14px; color: var(--ink-2); cursor: pointer;
+  }
+  .nav li .no { font: 10px var(--mono); color: var(--mute); }
+  .nav li .en { font: 10px var(--mono); color: var(--mute); letter-spacing: .1em; }
+  .nav li.on { background: var(--ink); color: #fff; }
+  .nav li.on .no { color: var(--signal); }
+  .nav li.on .en { color: #8d8e91; }
+  .zones { list-style: none; margin: 0 0 30px; padding: 0; }
+  .zones li {
+    display: grid; grid-template-columns: 28px 1fr auto; align-items: center;
+    height: 36px; padding: 0 28px; font-size: 13.5px; color: var(--ink-2);
+  }
+  .zones .code {
+    font: 600 11px var(--din); width: 18px; height: 18px; display: grid; place-items: center;
+    border: 1px solid var(--hair-strong);
+  }
+  .zones .n, .tags .n { font: 12px var(--din); color: var(--mute); }
+  .tags { padding: 0 28px; display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--ink-2); }
+  .tags span { white-space: nowrap; }
+  .tags span::before { content: "/"; color: var(--hair-strong); margin-right: 3px; }
+
+  /* 主区 */
+  main { position: fixed; left: 249px; right: 0; top: 65px; bottom: 41px; padding: 34px 56px 0 48px; overflow: hidden; }
+  .head { display: grid; grid-template-columns: auto 1fr; align-items: end; gap: 28px; }
+  .head h1 { margin: 0; font: 900 64px/0.9 var(--cjk); letter-spacing: -.01em; }
+  .meta { font: 10.5px/1.7 var(--mono); color: var(--mute); letter-spacing: .06em; padding-bottom: 4px; }
+  .meta b { color: var(--ink); font-weight: 400; }
+
+  .search {
+    margin: 30px 0 22px; height: 52px; border-bottom: 2px solid var(--ink);
+    display: grid; grid-template-columns: 34px 1fr auto auto; align-items: center; gap: 12px;
+  }
+  .search .p { font: 600 15px var(--mono); }
+  .search .q { font-size: 18px; color: var(--mute); }
+  .search .eng { font: 11px var(--mono); color: var(--ink-2); letter-spacing: .06em; }
+  .search kbd { font: 10.5px var(--mono); border: 1px solid var(--hair-strong); padding: 2px 6px; color: var(--ink-2); }
+
+  .tools { display: flex; align-items: center; gap: 26px; font: 11px var(--mono); color: var(--ink-2); letter-spacing: .06em; margin-bottom: 8px; }
+  .tools .grow { flex: 1; }
+  .tools span b { font-weight: 400; color: var(--ink); }
+
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    text-align: left; font: 400 9.5px var(--mono); color: var(--mute); letter-spacing: .12em;
+    padding: 10px 0; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--hair);
+  }
+  td { height: 44px; border-bottom: 1px solid var(--hair); padding: 0; font-size: 14.5px; white-space: nowrap; }
+  tr.row { position: relative; cursor: pointer; }
+  .c-no { width: 72px; font: 11px var(--mono); color: var(--mute); }
+  .c-ico { width: 36px; }
+  .c-ico img { width: 18px; height: 18px; display: block; }
+  .c-ico .fb { width: 18px; height: 18px; display: grid; place-items: center; background: var(--ink); color: #fff; font: 600 10px var(--din); }
+  .c-title { font-weight: 500; }
+  .c-host { font: 12px var(--mono); color: var(--mute); }
+  .c-zone { width: 92px; font: 600 11px var(--din); letter-spacing: .06em; color: var(--ink-2); }
+  .c-tags { width: 150px; font-size: 12.5px; color: var(--ink-2); }
+  .c-tags span::before { content: "/"; color: var(--hair-strong); margin-right: 2px; }
+  .c-date { width: 88px; text-align: right; font: 12px var(--din); color: var(--mute); }
+  tr.row:hover td { background: var(--sheet); }
+  tr.row:hover .c-no { color: var(--ink); }
+  tr.sel td { background: var(--signal) !important; }
+  tr.sel .c-no, tr.sel .c-host, tr.sel .c-date { color: var(--ink); }
+  tr.sel .c-no::before { content: "▶ "; }
+
+  footer {
+    position: fixed; left: 0; right: 0; bottom: 0; height: 40px;
+    display: flex; align-items: center; gap: 32px; padding: 0 28px;
+    font: 10px var(--mono); color: var(--mute); letter-spacing: .1em;
+  }
+  footer .grow { flex: 1; }
+  footer .bar { width: 160px; height: 3px; background: var(--hair); position: relative; }
+  footer .bar::after { content: ""; position: absolute; inset: 0 0 0 0; width: 100%; background: var(--ink); }
+</style>
+</head>
+<body>
+  <div class="frame"><i class="v1"></i><i class="h1"></i><i class="h2"></i></div>
+  <span class="cross" style="left:243px;top:59px"></span>
+  <span class="cross" style="left:243px;bottom:35px"></span>
+
+  <svg class="contour" viewBox="0 0 600 420" fill="none" stroke="#bdbdb6" stroke-width="1">
+    <path d="M40 380 C120 300 210 330 260 260 S410 170 560 210"/>
+    <path d="M70 400 C150 330 240 360 290 290 S430 210 580 245"/>
+    <path d="M110 420 C180 365 270 390 320 325 S450 250 600 282"/>
+    <path d="M10 350 C90 270 180 300 230 228 S390 130 540 172"/>
+    <path d="M0 312 C60 240 150 262 200 196 S370 92 520 132"/>
+    <path d="M0 270 C40 210 120 222 172 166 S350 56 500 92"/>
+    <path d="M0 226 C30 182 96 186 146 138 S330 22 480 54"/>
+    <circle cx="430" cy="160" r="3" fill="#111" stroke="none"/>
+    <text x="440" y="156" font-family="Cascadia Mono, monospace" font-size="9" fill="#8d8e91" stroke="none">PT. 07 / 31.2N 121.4E</text>
+  </svg>
+
+  <header class="topbar">
+    <div class="mark"><b>STAR</b><span>INDEX / v1</span></div>
+    <div class="crumb">STAR // <em>常用 FAVORITES</em> // 12 ENTRIES</div>
+    <div class="top-actions">
+      <button aria-label="主题">◐</button>
+      <button aria-label="设置">⚙</button>
+      <button class="new">＋ 新建收藏 <small>N</small></button>
+    </div>
+  </header>
+
+  <aside class="side">
+    <h6><span>VIEW 视图</span></h6>
+    <ul class="nav">
+      <li class="on"><span class="no">01</span>常用<span class="en">FAV</span></li>
+      <li><span class="no">02</span>全部<span class="en">ALL</span></li>
+      <li><span class="no">03</span>归档<span class="en">ARC</span></li>
+    </ul>
+    <h6><span>ZONE 分类</span><span>＋</span></h6>
+    <ul class="zones" id="zones"></ul>
+    <h6><span>TAG 标签</span></h6>
+    <div class="tags" id="tags"></div>
+  </aside>
+
+  <main>
+    <div class="head">
+      <h1>常用</h1>
+      <div class="meta">
+        <b>INDEX 01</b> — FAVORITES<br>
+        12 ENTRIES · 3 ZONES · 8 TAGS<br>
+        SORT: MANUAL · LAST SYNC 07.29 09:41
+      </div>
+    </div>
+
+    <div class="search">
+      <span class="p">&gt;&gt;</span>
+      <span class="q">搜索收藏，或输入网址</span>
+      <span class="eng">BING ▾</span>
+      <kbd>CTRL K</kbd>
+    </div>
+
+    <div class="tools">
+      <span>SHOWING <b>12</b> / 12</span>
+      <span class="grow"></span>
+      <span>↕ 手动排序</span>
+      <span>⟳ 检查链接</span>
+      <span>☐ 批量管理</span>
+    </div>
+
+    <table>
+      <thead><tr><th>NO.</th><th></th><th>SITE 站点</th><th>ADDRESS</th><th>ZONE</th><th>TAG</th><th style="text-align:right">LAST</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </main>
+
+  <footer>
+    <span>© YAPENG · LOCAL ONLY</span>
+    <span>LINK CHECK 12/12 OK</span>
+    <span class="bar"></span>
+    <span class="grow"></span>
+    <span>127.0.0.1 // OFFLINE READY</span>
+  </footer>
+
+<script src="data.js"></script>
+<script>
+  const { bookmarks, categories, tags, categoryOf, countIn, pad } = window.MOCK;
+  document.getElementById('zones').innerHTML = categories.map((c) =>
+    `<li><span class="code">${c.code}</span>${c.name}<span class="n">${pad(countIn(c.id))}</span></li>`).join('');
+  document.getElementById('tags').innerHTML = tags.map(([t, n]) => `<span>${t} <span class="n">${n}</span></span>`).join('');
+  document.getElementById('rows').innerHTML = bookmarks.map((b) => {
+    const c = categoryOf(b.categoryId);
+    return `<tr class="row${b.index === 11 ? ' sel' : ''}">
+      <td class="c-no">${c.code}-${pad(b.index)}</td>
+      <td class="c-ico"><img src="${b.favicon}" alt="" onerror="this.outerHTML='<span class=fb>${b.title[0].toUpperCase()}</span>'"></td>
+      <td class="c-title">${b.title}</td>
+      <td class="c-host">${b.host.replace(/^www\./, '')}</td>
+      <td class="c-zone">${c.code} · ${c.en}</td>
+      <td class="c-tags">${b.tags.map((t) => `<span>${t}</span>`).join(' ')}</td>
+      <td class="c-date">${b.date}</td>
+    </tr>`;
+  }).join('');
+</script>
+</body>
+</html>

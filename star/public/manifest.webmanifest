@@ -1,0 +1,19 @@
+{
+  "name": "Star 本地收藏夹",
+  "short_name": "Star 收藏",
+  "description": "本地优先的个人收藏管理与网页入口。",
+  "lang": "zh-CN",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f4f0e8",
+  "theme_color": "#0b203c",
+  "icons": [
+    {
+      "src": "/icons/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

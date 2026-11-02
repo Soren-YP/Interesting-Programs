@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>B · 设备铭牌</title>
+<style>
+  :root {
+    --ground: #141518;
+    --panel: #1b1d21;
+    --raise: #23262b;
+    --hair: #2d3036;
+    --hair-2: #3b3f46;
+    --text: #e9e9e6;
+    --text-2: #a7aab0;
+    --mute: #6e727a;
+    --signal: #19c2e6;
+    --signal-ink: #04151a;
+    --warn: #e6a019;
+    --cjk: "MiSans", "Noto Sans SC", "Microsoft YaHei UI", sans-serif;
+    --din: "Bahnschrift", "DIN Alternate", "Segoe UI Variable Display", sans-serif;
+    --mono: "Cascadia Mono", "Consolas", monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--ground); color: var(--text); font-family: var(--cjk);
+    -webkit-font-smoothing: antialiased; overflow: hidden;
+    display: grid; grid-template-columns: 72px 1fr 400px; grid-template-rows: 56px 1fr;
+  }
+
+  /* 图标轨 */
+  .rail {
+    grid-row: 1 / 3; border-right: 1px solid var(--hair);
+    display: flex; flex-direction: column; align-items: center; padding-top: 14px; gap: 6px;
+  }
+  .logo {
+    width: 40px; height: 40px; background: var(--text); color: var(--ground);
+    display: grid; place-items: center; font: 700 15px var(--din); margin-bottom: 18px; letter-spacing: .02em;
+  }
+  .rail button {
+    width: 56px; height: 56px; border: 0; background: transparent; color: var(--mute);
+    display: grid; place-items: center; align-content: center; gap: 3px; cursor: pointer; position: relative;
+    font: 11px var(--cjk);
+  }
+  .rail button b { font: 600 16px var(--din); letter-spacing: .04em; }
+  .rail button.on { color: var(--text); }
+  .rail button.on::before { content: ""; position: absolute; left: -8px; top: 10px; bottom: 10px; width: 3px; background: var(--signal); }
+  .rail .spacer { flex: 1; }
+  .rail .ver { font: 9px var(--mono); color: var(--mute); writing-mode: vertical-rl; letter-spacing: .2em; padding-bottom: 18px; }
+
+  /* 顶栏 */
+  .bar {
+    grid-column: 2 / 4; border-bottom: 1px solid var(--hair);
+    display: grid; grid-template-columns: 1fr 520px 1fr; align-items: center; padding: 0 0 0 28px;
+  }
+  .crumb { font: 11px var(--mono); color: var(--mute); letter-spacing: .08em; }
+  .crumb em { font-style: normal; color: var(--text); }
+  .search {
+    height: 36px; background: var(--panel); border: 1px solid var(--hair-2);
+    display: grid; grid-template-columns: 28px 1fr auto; align-items: center; padding: 0 10px;
+    font-size: 13.5px; color: var(--mute);
+  }
+  .search .p { color: var(--signal); font: 600 12px var(--mono); }
+  .search kbd { font: 10px var(--mono); color: var(--text-2); border: 1px solid var(--hair-2); padding: 1px 5px; }
+  .bar .act { justify-self: end; display: flex; height: 56px; }
+  .bar .act button {
+    border: 0; border-left: 1px solid var(--hair); background: transparent; color: var(--text-2);
+    padding: 0 20px; font: 13px var(--cjk); cursor: pointer; display: flex; align-items: center; gap: 8px;
+  }
+  .bar .act button small { font: 9.5px var(--mono); color: var(--mute); }
+  .bar .act .new { background: var(--signal); color: var(--signal-ink); font-weight: 600; }
+  .bar .act .new small { color: #0b4f5e; }
+
+  /* 列表 */
+  .list { overflow: hidden; display: flex; flex-direction: column; border-right: 1px solid var(--hair); }
+  .list-head { padding: 26px 28px 16px; display: flex; align-items: end; gap: 22px; }
+  .list-head h1 { margin: 0; font: 300 40px/1 var(--din); letter-spacing: .04em; }
+  .list-head h1 span { font: 500 15px var(--cjk); letter-spacing: 0; margin-left: 10px; color: var(--text-2); }
+  .list-head .count { font: 11px var(--mono); color: var(--mute); padding-bottom: 4px; letter-spacing: .08em; }
+  .chips { display: flex; gap: 0; padding: 0 28px 14px; }
+  .chips span {
+    font: 12.5px var(--cjk); color: var(--text-2); padding: 6px 14px; border: 1px solid var(--hair-2); margin-right: -1px;
+  }
+  .chips span b { font: 500 11px var(--din); color: var(--mute); margin-left: 6px; }
+  .chips span.on { background: var(--text); color: var(--ground); border-color: var(--text); }
+  .chips span.on b { color: var(--ground); }
+  .chips .sort { margin-left: auto; border: 0; font: 11px var(--mono); color: var(--mute); letter-spacing: .06em; }
+
+  .rows { flex: 1; padding: 0 16px 0 28px; }
+  .row {
+    display: grid; grid-template-columns: 52px 28px 1fr 120px 64px; align-items: center;
+    height: 54px; border-top: 1px solid var(--hair); position: relative; cursor: pointer;
+  }
+  .row .idx { font: 300 22px var(--din); color: var(--hair-2); letter-spacing: .02em; }
+  .row img, .row .fb { width: 18px; height: 18px; display: block; }
+  .row .fb { background: var(--raise); color: var(--text-2); display: grid; place-items: center; font: 600 10px var(--din); }
+  .row .t { font-size: 14.5px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .row .t small { display: block; font: 11px var(--mono); color: var(--mute); font-weight: 400; margin-top: 2px; }
+  .row .plate {
+    justify-self: start; font: 600 10.5px var(--din); letter-spacing: .1em; color: var(--text-2);
+    border: 1px solid var(--hair-2); padding: 3px 8px 3px 6px; display: flex; gap: 6px; align-items: center;
+  }
+  .row .plate::before { content: ""; width: 3px; height: 10px; background: var(--c); }
+  .row .d { text-align: right; font: 12px var(--din); color: var(--mute); }
+  .row:hover { background: var(--panel); }
+  .row:hover .idx { color: var(--text-2); }
+  .row.sel { background: var(--raise); }
+  .row.sel .idx { color: var(--signal); }
+  .row.sel::before { content: ""; position: absolute; left: -28px; top: -1px; bottom: 0; width: 3px; background: var(--signal); }
+
+  /* 详情 */
+  .detail { padding: 26px 32px; display: flex; flex-direction: column; overflow: hidden; }
+  .detail .lab { font: 10px var(--mono); color: var(--mute); letter-spacing: .14em; display: flex; justify-content: space-between; }
+  .shot {
+    margin: 16px 0 22px; height: 168px; background: var(--panel); position: relative;
+    display: grid; place-items: center;
+    background-image: radial-gradient(var(--hair-2) 1px, transparent 1px); background-size: 14px 14px;
+  }
+  .shot img, .shot .fb { width: 56px; height: 56px; }
+  .shot .fb { display: grid; place-items: center; background: var(--text); color: var(--ground); font: 600 28px var(--din); }
+  .shot i { position: absolute; width: 12px; height: 12px; border: 0 solid var(--text-2); }
+  .shot .a { left: 8px; top: 8px; border-left-width: 1px; border-top-width: 1px; }
+  .shot .b { right: 8px; top: 8px; border-right-width: 1px; border-top-width: 1px; }
+  .shot .c { left: 8px; bottom: 8px; border-left-width: 1px; border-bottom-width: 1px; }
+  .shot .e { right: 8px; bottom: 8px; border-right-width: 1px; border-bottom-width: 1px; }
+  .shot .coord { position: absolute; left: 26px; bottom: 9px; font: 9px var(--mono); color: var(--mute); letter-spacing: .1em; }
+  .detail h2 { margin: 0; font: 600 30px/1.1 var(--cjk); }
+  .detail .url { font: 12px var(--mono); color: var(--signal); margin: 8px 0 22px; }
+  dl { margin: 0; display: grid; grid-template-columns: 96px 1fr; border-top: 1px solid var(--hair); }
+  dt, dd { margin: 0; padding: 11px 0; border-bottom: 1px solid var(--hair); font-size: 13px; }
+  dt { font: 10px/1.9 var(--mono); color: var(--mute); letter-spacing: .12em; }
+  dd .ok { color: var(--signal); font: 600 12px var(--din); letter-spacing: .08em; }
+  .note { font-size: 13px; color: var(--text-2); line-height: 1.7; margin: 18px 0 0; }
+  .ops { margin-top: auto; display: grid; grid-template-columns: 1fr auto auto; gap: 1px; background: var(--hair); }
+  .ops button {
+    border: 0; height: 48px; background: var(--panel); color: var(--text); font: 14px var(--cjk); cursor: pointer; padding: 0 20px;
+  }
+  .ops .open { background: var(--signal); color: var(--signal-ink); font-weight: 600; text-align: left; display: flex; justify-content: space-between; align-items: center; }
+  .ops .open small { font: 10px var(--mono); letter-spacing: .1em; }
+  .hazard {
+    height: 6px; margin-top: 14px;
+    background: repeating-linear-gradient(-45deg, var(--hair-2) 0 6px, transparent 6px 12px);
+  }
+</style>
+</head>
+<body>
+  <nav class="rail">
+    <div class="logo">ST</div>
+    <button class="on"><b>01</b>常用</button>
+    <button><b>02</b>全部</button>
+    <button><b>03</b>归档</button>
+    <span class="spacer"></span>
+    <span class="ver">STAR · LOCAL · v1</span>
+  </nav>
+
+  <header class="bar">
+    <span class="crumb">STAR // <em>FAVORITES</em> // MANUAL</span>
+    <div class="search"><span class="p">&gt;&gt;</span>搜索收藏，或输入网址<kbd>CTRL K</kbd></div>
+    <div class="act">
+      <button>导入 <small>IMPORT</small></button>
+      <button>批量 <small>BATCH</small></button>
+      <button class="new">＋ 新建 <small>N</small></button>
+    </div>
+  </header>
+
+  <section class="list">
+    <div class="list-head">
+      <h1>FAVORITES<span>常用</span></h1>
+      <span class="count">12 ENTRIES</span>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="rows" id="rows"></div>
+  </section>
+
+  <aside class="detail" id="detail"></aside>
+
+<script src="data.js"></script>
+<script>
+  const { bookmarks, categories, categoryOf, countIn, pad } = window.MOCK;
+  const tone = { work: '#e6a019', study: '#19c2e6', design: '#e85d75' };
+  const fallback = (b) => `onerror="this.outerHTML='<span class=fb>${b.title[0].toUpperCase()}</span>'"`;
+  document.getElementById('chips').innerHTML =
+    `<span class="on">全部<b>12</b></span>` +
+    categories.map((c) => `<span>${c.name}<b>${pad(countIn(c.id))}</b></span>`).join('') +
+    `<span class="sort">SORT ▾ MANUAL</span>`;
+  document.getElementById('rows').innerHTML = bookmarks.map((b) => {
+    const c = categoryOf(b.categoryId);
+    return `<div class="row${b.index === 11 ? ' sel' : ''}">
+      <span class="idx">${pad(b.index)}</span>
+      <img src="${b.favicon}" alt="" ${fallback(b)}>
+      <span class="t">${b.title}<small>${b.host.replace(/^www\./, '')}</small></span>
+      <span class="plate" style="--c:${tone[c.id]}">${c.en}</span>
+      <span class="d">${b.date}</span>
+    </div>`;
+  }).join('');
+  const b = bookmarks[10];
+  document.getElementById('detail').innerHTML = `
+    <div class="lab"><span>ENTRY ${pad(b.index)} / 12</span><span>DETAIL 详情</span></div>
+    <div class="shot"><i class="a"></i><i class="b"></i><i class="c"></i><i class="e"></i>
+      <img src="${b.favicon}" alt="" ${fallback(b)}><span class="coord">D-11 · 05.21 14:00</span></div>
+    <h2>${b.title}</h2>
+    <div class="url">https://${b.host}/</div>
+    <dl>
+      <dt>CATEGORY</dt><dd>设计 Design</dd>
+      <dt>TAGS</dt><dd>${b.tags.join(' / ')}</dd>
+      <dt>ADDED</dt><dd>2026.05.21</dd>
+      <dt>STATUS</dt><dd><span class="ok">● 200 OK</span></dd>
+    </dl>
+    <p class="note">设计灵感与作品集参考。</p>
+    <div class="hazard"></div>
+    <div class="ops"><button class="open">打开 <small>ENTER ↗</small></button><button>编辑</button><button>归档</button></div>`;
+</script>
+</body>
+</html>

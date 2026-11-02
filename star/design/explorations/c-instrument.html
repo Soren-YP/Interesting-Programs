@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>C · 精密仪器</title>
+<style>
+  :root {
+    --ground: #f5f5f7;
+    --surface: #ffffff;
+    --ink: #1d1d1f;
+    --ink-2: #6e6e73;
+    --mute: #a1a1a6;
+    --hair: rgba(0, 0, 0, .08);
+    --needle: #ff4f12;
+    --cjk: "MiSans", "Noto Sans SC", "Microsoft YaHei UI", sans-serif;
+    --din: "Bahnschrift", "DIN Alternate", "Segoe UI Variable Display", sans-serif;
+    --mono: "Cascadia Mono", "Consolas", monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--ground); color: var(--ink); font-family: var(--cjk);
+    -webkit-font-smoothing: antialiased; overflow: hidden;
+  }
+
+  .top {
+    height: 64px; padding: 0 40px; display: flex; align-items: center; gap: 18px;
+  }
+  .top b { font: 600 19px var(--cjk); letter-spacing: -.01em; }
+  .top .grow { flex: 1; }
+  .top .ic {
+    width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
+    color: var(--ink-2); font-size: 15px;
+  }
+  .top .new {
+    height: 34px; padding: 0 16px; border-radius: 17px; background: var(--ink); color: #fff;
+    display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 500;
+  }
+
+  .stage { width: 1040px; margin: 0 auto; padding-top: 40px; }
+
+  .lens {
+    height: 64px; border-radius: 32px; background: var(--surface);
+    box-shadow: 0 1px 0 var(--hair), 0 12px 40px -18px rgba(0, 0, 0, .18);
+    display: grid; grid-template-columns: 64px 1fr auto; align-items: center; padding-right: 22px;
+  }
+  .lens .dot { justify-self: center; width: 10px; height: 10px; border-radius: 50%; background: var(--needle); box-shadow: 0 0 0 5px rgba(255, 79, 18, .12); }
+  .lens .q { font-size: 21px; color: var(--mute); letter-spacing: -.01em; }
+  .lens .hint { font: 11px var(--mono); color: var(--mute); letter-spacing: .04em; }
+
+  .seg {
+    margin: 28px auto 0; width: max-content; padding: 3px; border-radius: 10px; background: rgba(0, 0, 0, .05);
+    display: flex; font-size: 13px;
+  }
+  .seg span { padding: 6px 22px; border-radius: 8px; color: var(--ink-2); }
+  .seg span.on { background: var(--surface); color: var(--ink); font-weight: 500; box-shadow: 0 1px 3px rgba(0, 0, 0, .1); }
+
+  /* 刻度尺：分类筛选 */
+  .scale { position: relative; margin: 46px 0 8px; height: 60px; }
+  .ticks {
+    position: absolute; left: 0; right: 0; top: 0; height: 14px;
+    background:
+      repeating-linear-gradient(90deg, var(--ink) 0 1px, transparent 1px 130px) 0 0 / 100% 14px no-repeat,
+      repeating-linear-gradient(90deg, var(--mute) 0 1px, transparent 1px 13px) 0 6px / 100% 8px no-repeat;
+  }
+  .scale .base { position: absolute; left: 0; right: 0; top: 14px; height: 1px; background: var(--ink); }
+  .scale .lbl {
+    position: absolute; top: 24px; transform: translateX(-50%); text-align: center;
+    font-size: 13px; color: var(--ink-2); white-space: nowrap;
+  }
+  .scale .lbl small { display: block; font: 10px var(--din); color: var(--mute); letter-spacing: .1em; margin-top: 1px; }
+  .scale .lbl.on { color: var(--ink); font-weight: 600; }
+  .scale .lbl.on small { color: var(--needle); }
+  .needle { position: absolute; top: -10px; width: 2px; height: 26px; background: var(--needle); transform: translateX(-1px); }
+  .needle::before {
+    content: ""; position: absolute; left: -4px; top: -6px; border: 5px solid transparent; border-top: 6px solid var(--needle);
+  }
+  .scale .read { position: absolute; right: 0; top: -26px; font: 10px var(--mono); color: var(--mute); letter-spacing: .08em; }
+
+  /* 图标阵列 */
+  .grid { margin-top: 28px; display: grid; grid-template-columns: repeat(6, 1fr); gap: 26px 18px; }
+  .tile { text-align: center; position: relative; cursor: pointer; }
+  .tile .sq {
+    width: 76px; height: 76px; margin: 0 auto; border-radius: 22px; background: var(--surface);
+    display: grid; place-items: center; position: relative;
+    box-shadow: 0 1px 0 var(--hair), 0 8px 24px -14px rgba(0, 0, 0, .25);
+    transition: transform .18s cubic-bezier(.2, .8, .2, 1);
+  }
+  .tile img, .tile .fb { width: 34px; height: 34px; }
+  .tile .fb { display: grid; place-items: center; font: 600 20px var(--din); color: var(--ink-2); }
+  .tile .no { position: absolute; left: 8px; top: 6px; font: 8.5px var(--mono); color: var(--mute); letter-spacing: .04em; }
+  .tile .t { margin-top: 10px; font-size: 13px; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 4px; }
+  .tile .h { font: 10.5px var(--mono); color: var(--mute); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tile:hover .sq { transform: translateY(-3px); }
+  .tile.sel .sq { box-shadow: 0 0 0 2px var(--needle), 0 10px 26px -12px rgba(255, 79, 18, .45); }
+  .tile.dim { opacity: .28; }
+
+  .foot {
+    position: fixed; left: 40px; right: 40px; bottom: 22px; display: flex; gap: 22px;
+    font: 10px var(--mono); color: var(--mute); letter-spacing: .08em;
+  }
+  .foot .grow { flex: 1; }
+  .foot .tags span { font: 12px var(--cjk); color: var(--ink-2); margin-left: 12px; letter-spacing: 0; }
+</style>
+</head>
+<body>
+  <header class="top">
+    <b>Star</b>
+    <span class="grow"></span>
+    <span class="ic">◐</span>
+    <span class="ic">⋯</span>
+    <span class="new">＋ 新建收藏</span>
+  </header>
+
+  <div class="stage">
+    <div class="lens">
+      <span class="dot"></span>
+      <span class="q">搜索收藏，或输入网址</span>
+      <span class="hint">↵ 打开 · CTRL ↵ 网页搜索</span>
+    </div>
+
+    <div class="seg"><span class="on">常用</span><span>全部</span><span>归档</span></div>
+
+    <div class="scale" id="scale">
+      <span class="read">ZONE · 学习 06 / 12</span>
+      <div class="ticks"></div>
+      <div class="base"></div>
+    </div>
+
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <footer class="foot">
+    <span>12 ENTRIES · MANUAL ORDER</span>
+    <span class="tags">TAGS<span>前端</span><span>工具</span><span>文档</span><span>产品</span><span>设计</span></span>
+    <span class="grow"></span>
+    <span>LOCAL // 127.0.0.1</span>
+  </footer>
+
+<script src="data.js"></script>
+<script>
+  const { bookmarks, categories, countIn, pad } = window.MOCK;
+  const stops = [{ id: 'all', name: '全部', n: 12 }, ...categories.map((c) => ({ id: c.id, name: c.name, n: countIn(c.id) }))];
+  const active = 'study';
+  const scale = document.getElementById('scale');
+  stops.forEach((s, i) => {
+    const x = `${12.5 + i * 25}%`;
+    const on = s.id === active;
+    scale.insertAdjacentHTML('beforeend',
+      `<span class="lbl${on ? ' on' : ''}" style="left:${x}">${s.name}<small>${pad(s.n)}</small></span>` +
+      (on ? `<span class="needle" style="left:${x}"></span>` : ''));
+  });
+  const fallback = (b) => `onerror="this.outerHTML='<span class=fb>${b.title[0].toUpperCase()}</span>'"`;
+  document.getElementById('grid').innerHTML = bookmarks.map((b) => `
+    <div class="tile${b.categoryId !== active ? ' dim' : ''}${b.index === 2 ? ' sel' : ''}">
+      <div class="sq"><span class="no">${pad(b.index)}</span><img src="${b.favicon}" alt="" ${fallback(b)}></div>
+      <div class="t">${b.title.split(' - ')[0]}</div>
+      <div class="h">${b.host.replace(/^www\./, '')}</div>
+    </div>`).join('');
+</script>
+</body>
+</html>

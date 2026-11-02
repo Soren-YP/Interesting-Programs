@@ -1,148 +1,357 @@
-﻿<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="一个简洁高效的个人收藏与网页入口。">
-    <meta name="theme-color" content="#21171d">
-    <title>收藏 · 个人网络入口</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-</head>
+    <meta name="description" content="本地优先的个人收藏管理与网页入口。">
+    <meta name="theme-color" content="#eceef1">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <title>Star · 本地收藏夹</title>
+  </head>
+  <body>
+    <div class="atelier" aria-hidden="true">
+      <i class="plane plane-1"></i>
+      <i class="plane plane-2"></i>
+      <i class="plane plane-3"></i>
+      <i class="plane plane-4"></i>
+      <i class="plane plane-5"></i>
+      <i class="plane plane-6"></i>
 
-<body>
-    <div class="ambient ambient-one"></div>
-    <div class="ambient ambient-two"></div>
+      <svg class="construct" fill="none">
+        <line class="construct-blue" x1="0" y1="86%" x2="100%" y2="13%" />
+        <line class="construct-blue faint" x1="19%" y1="0" x2="11%" y2="100%" />
+        <line class="construct-ink" x1="100%" y1="64%" x2="70%" y2="100%" />
+      </svg>
 
-    <div class="app">
-        <aside class="sidebar">
-            <div class="app-title">
-                <span class="brand-mark"><i class="fas fa-bookmark"></i></span>
-                <div>
-                    <h1>收藏</h1>
-                    <p>个人网络入口</p>
-                </div>
-            </div>
-
-            <div class="theme-switch">
-                <span>夜间模式</span>
-                <label class="switch" aria-label="切换深色模式">
-                    <input type="checkbox" id="theme-toggle">
-                    <span class="slider round"></span>
-                </label>
-            </div>
-
-            <nav class="categories" aria-label="收藏分类">
-                <h2>分类</h2>
-                <ul id="category-list">
-                    <li data-category="all" class="active">全部收藏</li>
-                    <li data-category="work">工作</li>
-                    <li data-category="study">学习</li>
-                    <li data-category="entertainment">娱乐</li>
-                </ul>
-                <div class="add-category">
-                    <input type="text" id="new-category" placeholder="新分类名称">
-                    <button id="add-category-btn" type="button" title="添加分类" aria-label="添加分类">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                </div>
-            </nav>
-
-            <div class="bottom-actions">
-                <button id="import-btn" class="action-btn"><i class="fas fa-file-import"></i> 导入</button>
-                <button id="export-btn" class="action-btn"><i class="fas fa-file-export"></i> 导出</button>
-                <input type="file" id="import-file" accept=".json" hidden>
-            </div>
-
-            <div class="signature-container">
-                <span class="signature-text">Yapeng</span>
-            </div>
-        </aside>
-
-        <main class="main-content">
-            <section class="nav-search-panel" aria-label="网页搜索">
-                <form id="web-search-form" class="web-search-form">
-                    <div class="web-search-copy">
-                        <label class="web-search-label" for="web-search-input">去往任何地方</label>
-                        <p>输入关键词，或粘贴网址直接打开</p>
-                    </div>
-                    <div class="web-search-shell">
-                        <i class="fas fa-magnifying-glass"></i>
-                        <input type="text" id="web-search-input" placeholder="输入关键词，或直接粘贴网址" autocomplete="off">
-                        <select id="web-search-engine" aria-label="搜索引擎">
-                            <option value="bing">Bing</option>
-                            <option value="google">Google</option>
-                            <option value="baidu">百度</option>
-                            <option value="duckduckgo">DuckDuckGo</option>
-                        </select>
-                        <button type="submit">前往</button>
-                    </div>
-                </form>
-            </section>
-
-            <div class="top-bar">
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="search-input" placeholder="在收藏中搜索">
-                </div>
-                <button id="add-bookmark-btn" type="button"><i class="fas fa-plus"></i> 新建收藏</button>
-            </div>
-
-            <section class="star-section is-collapsed" id="star-section">
-                <div class="section-heading">
-                    <div>
-                        <h2>常用收藏</h2>
-                        <p id="bookmark-summary" class="section-description" aria-live="polite"></p>
-                    </div>
-                    <button id="toggle-star-btn" class="toggle-star-btn" type="button" aria-expanded="false" aria-controls="bookmarks-container">
-                        <span>展开全部</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
-                </div>
-                <div class="star-preview">
-                    <div class="bookmarks-container" id="bookmarks-container" aria-live="polite"></div>
-                </div>
-            </section>
-
-            <div class="modal" id="add-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-hidden="true">
-                <div class="modal-content" role="document">
-                    <button class="close-btn" type="button" aria-label="关闭">&times;</button>
-                    <h2 id="modal-title">添加收藏</h2>
-                    <form id="bookmark-form">
-                        <input type="hidden" id="bookmark-id">
-                        <div class="form-group">
-                            <label for="bookmark-url">网址</label>
-                            <input type="url" id="bookmark-url" placeholder="https://example.com" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="bookmark-title">标题</label>
-                            <input type="text" id="bookmark-title" placeholder="网站名称" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="bookmark-category">分类</label>
-                            <select id="bookmark-category">
-                                <option value="work">工作</option>
-                                <option value="study">学习</option>
-                                <option value="entertainment">娱乐</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="bookmark-notes">备注</label>
-                            <textarea id="bookmark-notes" placeholder="添加一点备注..."></textarea>
-                        </div>
-                        <div class="form-actions">
-                            <button type="button" id="cancel-btn">取消</button>
-                            <button type="submit" id="save-btn">保存</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </main>
+      <span class="stamp stamp-y">Y</span>
+      <span class="stamp stamp-y ghost">Y</span>
+      <span class="stamp stamp-a">A</span>
+      <span class="stamp stamp-p">P</span>
+      <span class="stamp stamp-e">E</span>
+      <span class="stamp stamp-n">N</span>
+      <span class="stamp stamp-g">G</span>
     </div>
 
-    <script src="script.js"></script>
-</body>
+    <svg class="leader-layer" id="leader-layer" aria-hidden="true" fill="none">
+      <circle id="leader-ring" r="21" />
+      <polyline id="leader-line" points="" />
+      <circle id="leader-end" r="3.5" />
+    </svg>
 
+    <div class="app-shell">
+      <button
+        id="sidebar-scrim"
+        class="sidebar-scrim"
+        type="button"
+        aria-label="关闭导航"
+        tabindex="-1"
+      ></button>
+
+      <aside id="sidebar" class="sidebar" aria-label="收藏夹导航">
+        <div class="brand">
+          <p class="brand-name">Star</p>
+          <button
+            id="sidebar-close"
+            class="icon-button sidebar-close"
+            type="button"
+            aria-label="关闭导航"
+          >
+            <i class="ph ph-x" aria-hidden="true"></i>
+          </button>
+        </div>
+
+        <nav id="sidebar-view-nav" class="sidebar-primary" aria-label="收藏视图">
+          <button class="sidebar-view-button" data-view="favorites" type="button">
+            <span class="ordinal" aria-hidden="true">1</span>
+            <span>常用</span>
+          </button>
+          <button class="sidebar-view-button" data-view="all" type="button">
+            <span class="ordinal" aria-hidden="true">2</span>
+            <span>全部</span>
+          </button>
+          <button class="sidebar-view-button" data-view="archive" type="button">
+            <span class="ordinal" aria-hidden="true">3</span>
+            <span>归档</span>
+          </button>
+        </nav>
+
+        <nav class="sidebar-section" aria-labelledby="category-heading">
+          <div class="sidebar-heading">
+            <h2 id="category-heading">分类</h2>
+            <button class="icon-button" id="add-category-button" type="button" aria-label="新建分类">
+              <i class="ph ph-plus" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div id="category-list" class="category-list"></div>
+        </nav>
+
+        <section class="sidebar-section" aria-labelledby="tag-heading">
+          <div class="sidebar-heading">
+            <h2 id="tag-heading">标签</h2>
+            <button class="text-button" id="clear-tags-button" type="button">清除</button>
+          </div>
+          <div id="tag-list" class="tag-list"></div>
+        </section>
+
+        <div class="sidebar-spacer"></div>
+
+        <details id="sidebar-more" class="sidebar-more">
+          <summary>
+            <span>设置与数据</span>
+            <i class="ph ph-caret-down" aria-hidden="true"></i>
+          </summary>
+          <div class="sidebar-more-panel">
+            <label class="setting-row">
+              <span>夜间模式</span>
+              <span class="switch">
+                <input id="theme-toggle" type="checkbox" aria-label="切换深色模式">
+                <span aria-hidden="true"></span>
+              </span>
+            </label>
+            <label class="setting-row">
+              <span>网页搜索</span>
+              <select id="search-engine">
+                <option value="bing">Bing</option>
+                <option value="google">Google</option>
+                <option value="baidu">百度</option>
+                <option value="duckduckgo">DuckDuckGo</option>
+              </select>
+            </label>
+            <button id="import-button" class="setting-action" type="button">导入数据</button>
+            <button id="export-json-button" class="setting-action" type="button">导出 JSON 备份</button>
+            <button id="export-html-button" class="setting-action" type="button">导出浏览器书签</button>
+            <input id="import-file" type="file" accept=".json,.html,.htm" hidden>
+          </div>
+        </details>
+      </aside>
+
+      <main class="main-content">
+        <header class="workspace-header">
+          <div class="mobile-header">
+            <button
+              id="sidebar-toggle"
+              class="icon-button"
+              type="button"
+              aria-label="打开导航"
+              aria-controls="sidebar"
+              aria-expanded="false"
+            >
+              <i class="ph ph-list" aria-hidden="true"></i>
+            </button>
+            <span class="mobile-brand">Star</span>
+          </div>
+
+          <div class="workspace-title-row">
+            <div class="title-block">
+              <h1 id="collection-title">常用</h1>
+              <span id="collection-latin" class="title-latin" aria-hidden="true">FAVORITES</span>
+              <p id="collection-meta" class="title-meta"></p>
+            </div>
+            <div class="header-actions">
+              <button
+                id="settings-button"
+                class="quiet-button"
+                type="button"
+                aria-label="打开设置"
+                title="打开设置"
+              >
+                设置
+              </button>
+              <button
+                id="new-bookmark-button"
+                class="new-node"
+                type="button"
+                data-testid="new-bookmark"
+              >
+                <span class="new-node-mark" aria-hidden="true"></span>
+                <span>新建</span>
+                <kbd aria-hidden="true">N</kbd>
+              </button>
+            </div>
+          </div>
+
+          <form id="omnibox-form" class="omnibox" role="search">
+            <button class="omnibox-submit" type="submit" aria-label="打开首个结果或搜索网页">
+              <span class="node" aria-hidden="true"></span>
+            </button>
+            <label class="visually-hidden" for="bookmark-search">搜索收藏或输入网址</label>
+            <input
+              id="bookmark-search"
+              data-testid="omnibox"
+              type="search"
+              placeholder="搜索收藏，或输入网址"
+              autocomplete="off"
+            >
+            <kbd aria-label="快捷键 Ctrl K">CTRL K</kbd>
+          </form>
+        </header>
+
+        <section class="collection-panel" aria-labelledby="collection-title">
+          <div class="view-tabs" role="tablist" aria-label="收藏视图">
+            <button data-view="favorites" type="button" role="tab">常用</button>
+            <button data-view="all" type="button" role="tab">全部</button>
+            <button data-view="archive" type="button" role="tab">归档</button>
+          </div>
+
+          <div class="toolbar">
+            <label class="select-visible" title="选择当前结果">
+              <input id="visible-selection-toggle" type="checkbox">
+              <span id="bookmark-summary" class="summary" aria-live="polite"></span>
+            </label>
+            <div class="toolbar-actions">
+              <label class="sort-control">
+                <span class="visually-hidden">排序方式</span>
+                <select id="sort-select">
+                  <option value="manual">手动排序</option>
+                  <option value="title">按名称</option>
+                  <option value="created">最近添加</option>
+                  <option value="visited">最近访问</option>
+                  <option value="visits">访问次数</option>
+                </select>
+              </label>
+              <button id="check-links-button" class="toolbar-button" type="button">
+                <span data-label>检查链接</span>
+              </button>
+              <button id="selection-mode-button" class="toolbar-button" type="button">
+                <span data-label>批量管理</span>
+              </button>
+            </div>
+          </div>
+
+          <div id="active-filters" class="active-filters" aria-live="polite"></div>
+
+          <div id="batch-toolbar" class="batch-toolbar" hidden>
+            <strong id="selected-count">已选择 0 项</strong>
+            <label>
+              <span class="visually-hidden">目标分类</span>
+              <select id="batch-category"></select>
+            </label>
+            <button id="batch-move" type="button">移动</button>
+            <input id="batch-tags" type="text" placeholder="标签，逗号分隔">
+            <button id="batch-add-tags" type="button">添加标签</button>
+            <button id="batch-remove-tags" type="button">移除标签</button>
+            <button id="batch-pin" type="button">置顶</button>
+            <button id="batch-unpin" type="button">取消置顶</button>
+            <button id="batch-archive" type="button">归档</button>
+            <button id="batch-restore" type="button">恢复</button>
+            <button id="batch-delete" class="danger-button" type="button">删除</button>
+          </div>
+
+          <div
+            id="bookmark-grid"
+            class="bookmark-grid"
+            data-testid="bookmark-list"
+            aria-live="polite"
+          ></div>
+        </section>
+      </main>
+
+      <aside id="annotation" class="annotation" aria-label="注释"></aside>
+    </div>
+
+    <div id="bookmark-dialog" class="dialog-backdrop" hidden>
+      <section class="dialog-card" role="dialog" aria-modal="true" aria-labelledby="bookmark-dialog-title">
+        <button class="dialog-close" type="button" data-close-dialog aria-label="关闭">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
+        <p class="eyebrow">ENTRY</p>
+        <h2 id="bookmark-dialog-title">新建收藏</h2>
+        <form id="bookmark-form">
+          <input id="bookmark-id" type="hidden">
+          <label>
+            网址
+            <input id="bookmark-url" type="url" placeholder="https://example.com" required>
+          </label>
+          <p id="metadata-status" class="field-hint" aria-live="polite"></p>
+          <label>
+            标题
+            <input id="bookmark-title" type="text" maxlength="200" placeholder="留空可自动读取">
+          </label>
+          <div class="field-pair">
+            <label>
+              分类
+              <select id="bookmark-category"></select>
+            </label>
+            <label>
+              标签
+              <input id="bookmark-tags" type="text" maxlength="500" placeholder="设计, 阅读, 工具">
+            </label>
+          </div>
+          <label>
+            备注
+            <textarea id="bookmark-notes" maxlength="2000" rows="3" placeholder="添加一点备注"></textarea>
+          </label>
+          <label class="checkbox-row">
+            <input id="bookmark-pinned" type="checkbox">
+            加入常用收藏
+          </label>
+          <div class="dialog-actions">
+            <button class="secondary-button" type="button" data-close-dialog>取消</button>
+            <button class="primary-button" type="submit">保存</button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <div id="category-dialog" class="dialog-backdrop" hidden>
+      <section class="dialog-card dialog-small" role="dialog" aria-modal="true" aria-labelledby="category-dialog-title">
+        <button class="dialog-close" type="button" data-close-dialog aria-label="关闭">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
+        <p class="eyebrow">INDEX</p>
+        <h2 id="category-dialog-title">新建分类</h2>
+        <form id="category-form">
+          <input id="category-id" type="hidden">
+          <label>
+            分类名称
+            <input id="category-name" type="text" maxlength="80" required>
+          </label>
+          <div class="dialog-actions">
+            <button class="secondary-button" type="button" data-close-dialog>取消</button>
+            <button class="primary-button" type="submit">保存</button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <div id="import-dialog" class="dialog-backdrop" hidden>
+      <section class="dialog-card" role="dialog" aria-modal="true" aria-labelledby="import-dialog-title">
+        <button class="dialog-close" type="button" data-close-dialog aria-label="关闭">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
+        <p class="eyebrow">IMPORT</p>
+        <h2 id="import-dialog-title">导入预览</h2>
+        <div id="import-summary" class="import-summary"></div>
+        <p class="dialog-note">合并会保留现有数据并跳过重复网址；替换会先创建可撤销的恢复快照。</p>
+        <div class="dialog-actions">
+          <button class="secondary-button" type="button" data-close-dialog>取消</button>
+          <button id="import-merge" class="secondary-button" type="button">安全合并</button>
+          <button id="import-replace" class="primary-button" type="button">完整替换</button>
+        </div>
+      </section>
+    </div>
+
+    <div id="confirm-dialog" class="dialog-backdrop" hidden>
+      <section
+        class="dialog-card dialog-small"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="confirm-title"
+        aria-describedby="confirm-message"
+      >
+        <p class="eyebrow">CONFIRM</p>
+        <h2 id="confirm-title">请确认</h2>
+        <p id="confirm-message" class="dialog-note"></p>
+        <div class="dialog-actions">
+          <button id="confirm-cancel" class="secondary-button" type="button">取消</button>
+          <button id="confirm-accept" class="danger-button" type="button">确认</button>
+        </div>
+      </section>
+    </div>
+
+    <div id="toast-region" class="toast-region" aria-live="polite" aria-atomic="true"></div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
 </html>

@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>E · 构造契约</title>
+<style>
+  :root {
+    --ground: #eceef1;
+    --plane: rgba(255, 255, 255, .62);
+    --ink: #0d0e12;
+    --ink-2: #4b4d55;
+    --mute: #8f929b;
+    --hair: rgba(13, 14, 18, .14);
+    --blue: #2340e0;
+    --serif: "Sitka Heading", "Noto Serif", "Noto Serif SC", serif;
+    --serif-zh: "Noto Serif SC", "Noto Serif SC Black", serif;
+    --cjk: "MiSans", "Noto Sans SC", "Microsoft YaHei UI", sans-serif;
+    --mono: "Cascadia Mono", "Consolas", monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--ground); color: var(--ink); font-family: var(--cjk); -webkit-font-smoothing: antialiased; overflow: hidden; position: relative; }
+
+  /* 底层：半透明平面、构造线、散落的衬线字母 */
+  .planes i { position: absolute; background: var(--plane); }
+  .planes .p1 { left: 180px; top: 120px; width: 620px; height: 64px; transform: skewY(-6deg); }
+  .planes .p2 { left: 860px; top: 520px; width: 520px; height: 120px; transform: skewY(-6deg); opacity: .7; }
+  .planes .p3 { left: 320px; top: 700px; width: 380px; height: 30px; transform: skewY(-6deg); }
+  .planes .p4 { left: 1000px; top: 60px; width: 300px; height: 380px; opacity: .45; }
+  svg.construct { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+
+  .glyph { position: absolute; font-family: var(--serif); font-weight: 700; line-height: .8; color: var(--ink); pointer-events: none; user-select: none; }
+  .g-s { left: 36px; top: 26px; font-size: 150px; transform: scaleX(-1); }
+  .g-s2 { left: 64px; top: 26px; font-size: 150px; opacity: .14; }
+  .g-t { left: 34px; bottom: 30px; font-size: 96px; }
+  .g-a { left: 1192px; top: 214px; font-size: 64px; }
+  .g-a2 { left: 1180px; top: 214px; font-size: 64px; transform: scaleX(-1); opacity: .35; }
+  .g-r { right: -34px; bottom: 120px; font-size: 300px; opacity: .1; }
+
+  /* 左栏 */
+  .side { position: absolute; left: 44px; top: 210px; width: 200px; }
+  .views { list-style: none; margin: 0 0 40px; padding: 0; }
+  .views li { display: flex; align-items: center; gap: 12px; height: 38px; font: 500 15px var(--serif-zh); color: var(--mute); cursor: pointer; }
+  .views li .k {
+    width: 20px; height: 20px; border-radius: 50%; border: 1px solid var(--mute); display: grid; place-items: center;
+    font: 600 11px var(--serif); color: var(--mute);
+  }
+  .views li.on { color: var(--ink); }
+  .views li.on .k { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .ruler { position: relative; padding-left: 26px; }
+  .ruler::before { content: ""; position: absolute; left: 6px; top: -10px; bottom: -10px; width: 1px; background: var(--ink); }
+  .ruler .lab { font: 10px var(--mono); color: var(--mute); letter-spacing: .3em; margin: 0 0 8px; }
+  .ruler div { position: relative; height: 34px; display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--ink-2); }
+  .ruler div::before { content: ""; position: absolute; left: -20px; top: 50%; width: 9px; height: 1px; background: var(--ink); }
+  .ruler div b { font: 400 12px var(--serif); color: var(--mute); }
+  .ruler div.on { color: var(--blue); }
+  .ruler div.on::before { width: 18px; left: -20px; background: var(--blue); height: 2px; }
+  .ruler div.on b { color: var(--blue); }
+  .tags { margin-top: 30px; font-size: 12.5px; color: var(--ink-2); line-height: 2; }
+  .tags span { margin-right: 10px; white-space: nowrap; }
+  .tags span sup { font: 9px var(--mono); color: var(--mute); margin-left: 1px; }
+
+  /* 页眉 */
+  .head { position: absolute; left: 292px; top: 56px; display: flex; align-items: flex-start; gap: 16px; }
+  .head h1 { margin: 0; font: 900 92px/1 var(--serif-zh); letter-spacing: .02em; }
+  .head .vert { writing-mode: vertical-rl; font: 10px var(--mono); letter-spacing: .5em; color: var(--ink-2); padding-top: 8px; }
+  .head .vert::after { content: "↲"; color: var(--blue); }
+  .head .meta { font: 11px/1.8 var(--mono); color: var(--mute); padding-top: 18px; }
+  .actions { position: absolute; right: 44px; top: 44px; display: flex; gap: 22px; align-items: center; font: 12px var(--mono); color: var(--ink-2); }
+  .actions .new { font: 600 14px var(--cjk); color: #fff; background: var(--ink); padding: 10px 20px; border-radius: 22px; }
+
+  .search {
+    position: absolute; left: 292px; top: 188px; width: 700px; height: 48px;
+    display: grid; grid-template-columns: 40px 1fr auto; align-items: center; border-bottom: 1px solid var(--ink);
+  }
+  .search .node { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--ink); position: relative; }
+  .search .node::after { content: ""; position: absolute; inset: 7px; border-radius: 50%; background: var(--blue); }
+  .search .q { font: 18px var(--serif-zh); color: var(--mute); }
+  .search kbd { font: 10.5px var(--mono); color: var(--ink-2); }
+
+  /* 列表 */
+  .list { position: absolute; left: 292px; top: 256px; width: 700px; }
+  .row { display: grid; grid-template-columns: 46px 40px 1fr auto 60px; align-items: center; height: 47px; border-bottom: 1px solid var(--hair); cursor: pointer; position: relative; }
+  .row .no { font: 400 15px var(--serif); color: var(--mute); }
+  .row .nd { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--hair); display: grid; place-items: center; background: rgba(255,255,255,.7); }
+  .row img, .row .fb { width: 16px; height: 16px; display: block; }
+  .row .fb { display: grid; place-items: center; font: 700 11px var(--serif); }
+  .row .t { font: 500 16px var(--serif-zh); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row .t small { font: 11px var(--mono); color: var(--mute); margin-left: 12px; }
+  .row .tg { font-size: 12px; color: var(--ink-2); }
+  .row .tg span + span::before { content: " · "; color: var(--mute); }
+  .row .d { text-align: right; font: 12px var(--serif); color: var(--mute); }
+  .row:hover .nd { border-color: var(--ink); }
+  .row.sel .nd { border: 1.5px solid var(--blue); box-shadow: 0 0 0 6px rgba(35, 64, 224, .08); }
+  .row.sel .no, .row.sel .t { color: var(--blue); }
+
+  /* 标注 */
+  .note { position: absolute; left: 1068px; top: 640px; width: 300px; }
+  .note .k { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--ink); color: #fff; font: 600 11px var(--serif); margin-right: 8px; }
+  .note h3 { margin: 0; display: inline; font: 700 30px var(--serif); letter-spacing: .01em; }
+  .note p { margin: 6px 0 0; font: 11.5px/1.8 var(--mono); color: var(--ink-2); }
+  .note .open { margin-top: 12px; display: inline-flex; gap: 10px; font: 12px var(--mono); letter-spacing: .3em; color: var(--blue); }
+</style>
+</head>
+<body>
+  <div class="planes"><i class="p1"></i><i class="p2"></i><i class="p3"></i><i class="p4"></i></div>
+
+  <svg class="construct" fill="none">
+    <line x1="0" y1="770" x2="1440" y2="120" stroke="#2340e0" stroke-width=".8" opacity=".55"/>
+    <line x1="260" y1="0" x2="160" y2="900" stroke="#2340e0" stroke-width=".8" opacity=".4"/>
+    <line x1="1440" y1="560" x2="980" y2="900" stroke="#0d0e12" stroke-width=".6" opacity=".25"/>
+    <circle cx="642" cy="212" r="330" stroke="#0d0e12" stroke-width="1.4" stroke-dasharray="1 9" opacity=".45"/>
+    <path d="M1180 60 V340 M1172 110 H1188 M1172 170 H1188 M1172 230 H1188 M1172 290 H1188" stroke="#0d0e12" stroke-width=".8" opacity=".6"/>
+    <path d="M1240 150 h28 M1254 136 v28" stroke="#2340e0" stroke-width="1.2"/>
+    <!-- 从选中条目引出的标注线 -->
+    <circle id="sel-node" cx="0" cy="0" r="22" stroke="#0d0e12" stroke-width=".8"/>
+    <polyline id="leader" points="" stroke="#0d0e12" stroke-width=".8"/>
+    <circle id="leader-end" cx="1056" cy="656" r="4" fill="#0d0e12"/>
+  </svg>
+
+  <span class="glyph g-s2">S</span><span class="glyph g-s">S</span>
+  <span class="glyph g-a2">A</span><span class="glyph g-a">A</span>
+  <span class="glyph g-t">T</span>
+  <span class="glyph g-r">R</span>
+
+  <div class="head">
+    <h1>常用</h1>
+    <span class="vert">FAVORITES</span>
+    <span class="meta">12 ENTRIES<br>MANUAL ORDER<br>— YAPENG</span>
+  </div>
+  <div class="actions"><span>◐</span><span>导入</span><span>批量</span><span class="new">＋ 新建收藏</span></div>
+
+  <div class="search"><span class="node"></span><span class="q">搜索收藏，或输入网址</span><kbd>CTRL K</kbd></div>
+
+  <aside class="side">
+    <ul class="views">
+      <li class="on"><span class="k">1</span>常用</li>
+      <li><span class="k">2</span>全部</li>
+      <li><span class="k">3</span>归档</li>
+    </ul>
+    <div class="ruler" id="ruler"></div>
+    <div class="tags" id="tags"></div>
+  </aside>
+
+  <div class="list" id="list"></div>
+
+  <div class="note" id="note"></div>
+
+<script src="data.js"></script>
+<script>
+  const { bookmarks, categories, tags, countIn, pad } = window.MOCK;
+  document.getElementById('ruler').innerHTML = '<p class="lab">INDEX</p>' +
+    `<div class="on">全部 <b>12</b></div>` +
+    categories.map((c) => `<div>${c.name} <b>${pad(countIn(c.id))}</b></div>`).join('');
+  document.getElementById('tags').innerHTML = tags.map(([t, n]) => `<span>${t}<sup>${n}</sup></span>`).join('');
+  const fb = (b) => `onerror="this.outerHTML='<span class=fb>${b.title[0].toUpperCase()}</span>'"`;
+  const sel = 11;
+  document.getElementById('list').innerHTML = bookmarks.map((b) => `
+    <div class="row${b.index === sel ? ' sel' : ''}">
+      <span class="no">${pad(b.index)}</span>
+      <span class="nd"><img src="${b.favicon}" alt="" ${fb(b)}></span>
+      <span class="t">${b.title}<small>${b.host.replace(/^www\./, '')}</small></span>
+      <span class="tg">${b.tags.map((t) => `<span>${t}</span>`).join('')}</span>
+      <span class="d">${b.date}</span>
+    </div>`).join('');
+  const b = bookmarks[sel - 1];
+  document.getElementById('note').innerHTML = `
+    <span class="k">${pad(sel)}</span><h3>${b.title}</h3>
+    <p>${b.host}<br>${b.tags.join(' · ')}<br>ADDED 2026.05.21 · STATUS 200</p>
+    <span class="open">OPEN ↵</span>`;
+  // 选中条目的图标节点 → 标注
+  const node = document.querySelector('.row.sel .nd').getBoundingClientRect();
+  const end = document.querySelector('.note').getBoundingClientRect();
+  const list = document.getElementById('list').getBoundingClientRect();
+  const cx = node.left + node.width / 2, cy = node.top + node.height / 2;
+  const ring = document.getElementById('sel-node');
+  ring.setAttribute('cx', cx); ring.setAttribute('cy', cy);
+  const dot = document.getElementById('leader-end');
+  dot.setAttribute('cx', end.left - 12); dot.setAttribute('cy', end.top + 16);
+  document.getElementById('leader').setAttribute('points', `${list.right + 8},${cy} ${end.left - 48},${cy} ${end.left - 12},${end.top + 16}`);
+</script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "name": "star-bookmarks",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k -n web,api -c magenta,cyan \"vite\" \"node --watch server/index.js --dev\"",
+    "build": "vite build",
+    "start": "node server/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0",
+    "jsdom": "^26.1.0",
+    "vite": "^7.0.0",
+    "vitest": "^3.2.0"
+  },
+  "dependencies": {
+    "@phosphor-icons/web": "^2.1.2"
+  }
+}
